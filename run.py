@@ -11,6 +11,9 @@ parser = argparse.ArgumentParser(description='Command line tool for bulk downloa
 parser.add_argument('-url', help='photo album url', dest='url')
 parser.add_argument('-dir', help='directory to download to', dest='dir')
 
+url = parser.parse_args().url
+directory = parser.parse_args().dir
+
 # go to main album page and find all image download urls
 def find_images_infinite(url):
     # get album page
@@ -48,7 +51,7 @@ def find_images_infinite(url):
 # download image at the given url
 def download(url):
     resp = requests.get(url, stream=True)
-    local_file = open(parser.parse_args().dir+"/"+url.split("/")[4]+'.jpg', 'wb')
+    local_file = open(directory+"/"+url.split("/")[4]+'.jpg', 'wb')
     resp.raw.decode_content = True
     shutil.copyfileobj(resp.raw, local_file)
     del resp
@@ -56,13 +59,13 @@ def download(url):
 
 
 if __name__ == "__main__":
-    if parser.parse_args().url == None:
+    if url == None:
         raise Exception("No url specified. Please specify an album url. Use -h for more information.")
 
-    if parser.parse_args().dir == None:
-        raise Exception("No directory specified. Use -h for more information.")
+    if directory == None:
+        directory = "./downloads"
 
-    images = find_images_infinite(parser.parse_args().url)
+    images = find_images_infinite(url)
     index = 1
     for image in images:
         download(image)
